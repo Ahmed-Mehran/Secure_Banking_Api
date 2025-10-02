@@ -20,8 +20,8 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent ## Actual pa
 
 APPS_DIR = BASE_DIR / "core_apps" ## Here APPS_DIR points to the path/folder containing the main apps
 
-local_env_file = BASE_DIR / ".env" / ".env.local" ## we can write this line like below as well but this is more preferred
-##local_env_file = path.join(BASE_DIR, ".env", ".env.local")
+local_env_file = BASE_DIR / ".envs" / ".env.local" ## we can write this line like below as well but this is more preferred
+##local_env_file = path.join(BASE_DIR, ".envs", ".env.local")
 
 if path.isfile(local_env_file):  ## This checks whether the file actually exists before trying to load it. It avoids attempting to load a non-existent file and makes the subsequent load_dotenv a guarded, explicit action.
     
