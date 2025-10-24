@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 from os import getenv, path
+from loguru import logger
+
+
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -172,3 +175,87 @@ STATIC_ROOT = str(BASE_DIR / "staticfiles")
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+LOGGING_CONFIG = None 
+# By default, Django automatically sets up its own logging configuration when the project starts. It uses a setting called LOGGING inside your settings.py file and applies it through:
+
+# LOGGING_CONFIG = 'django.utils.log.configure_logging'
+
+# That means Django automatically configures and manages all loggers, handlers, and formatters on startup. By default, Django does not explicitly show this line in your settings.py — but 
+# it’s applied internally by Django itself when the project starts.
+# When you write this line i.e LOGGING_CONFIG = None, you’re disabling Django’s automatic logging configuration so that you can control it fully using your own tool — here, loguru.
+# We write this LOGGING_CONFIG = None because when we use loguru, it provides its own powerful and flexible logging system, completely independent from Django’s built-in one.
+# If we let Django also apply its logging configuration, it can clash or duplicate logs, causing messy outputs or multiple handlers writing the same message.
+
+
+LOGURU_LOGGING = {
+    
+    "handlers" : [    ## Handlers are responsible for dispatching log messages to their appropriate destinations such as to console or a specific file or email etc
+                       # You can have multiple handlers for different log destinations.
+        
+        {
+            "sink": BASE_DIR / "logs/debug.log",  ## Sink specifies a destination for each record produced by the logger, here basically we refer refer the location where
+                                                  ## we want our log files to be. This log file will be responsible for displaying log records with different log levels
+                                                   # Here, it means all log messages handled by this configuration will be written to the file located at BASE_DIR/logs/debug.log
+                                                  
+                                                 
+            "level": "DEBUG",  ## By this we mean that we are going to store log message of level debug and the levels above debug(info, success and warning)
+            
+            "filter": lambda record: record["level"].no <= logger.level("WARNING"),  ## this filter function checks if the log records is less than or equal to warning level. This means
+                                                                                     # that this log file will include the debug, info and warning logs but exclude error and critical logs
+                                                                                     # The filter function is called for each log record.It checks if the log level number (record["level"].no)
+                                                                                     # is less than or equal to the numeric value of WARNING.
+                                                                                     
+            "format": "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}",  ## This format basically represents the format we want for our log messages i.e this
+                                                                                                              # this is the format they would be stored in the log file. The | separates the different
+                                                                                                              # part of the format message. This is just a separator to make the log line easier to read
+                                                                                                              # The {level} placeholder is used to include the log level. Example: INFO or ERROR
+                                                                                                              # The <8 species that the min width of the log level field 
+                                                                                                              # The {name} is the module name (the Python file) where the log message came from.
+                                                                                                              # Example: if the log is from views.py, it’ll show views.
+                                                                                                              # The {function} represents the function name inside the file where the log was written.
+                                                                                                              # Example: if you logged inside def get_user():, it’ll show get_user.
+                                                                                                              # The {line} represnts line number in the code where the log statement is written.
+                                                                                                              # Example: views.py:get_user:42 → line 42 inside get_user() in views.py
+                                                                                                              # - is just another separator before the actual message for readability.
+                                                                                                              # The {message} represents the actual log message you wrote in your code
+                                                                                                              # "2025-10-21 18:45:23.124 | INFO     | views:get_user:42 - User successfully logged in"
+                                                                                                              
+            "rotation": "10MB",
+            
+            "retention": "30 days",
+            
+            "compression": "zip"                                                                                                                                        
+        },
+        
+        {
+            "sink": BASE_DIR / "logs/error.log",  
+                                                 
+            "level": "ERROR", 
+            
+            "filter": lambda record: record["level"].no >= logger.level("ERROR"), ## capturing error and critical logs
+                                                                                     
+            "format": "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}", 
+            
+            "rotation": "10MB",
+            
+            "retention": "30 days",
+            
+            "compression": "zip",
+            
+            "backtrace": True,
+            
+            "diagnose": True                                                                                                                                       
+        }
+        
+        
+    ]
+}
+
+logger.configure(**LOGURU_LOGGING)
+
+
+
+
+

@@ -68,3 +68,5 @@ urllib3==2.5.0
 vine==5.1.0
 watchfiles==0.22.0
 wcwidth==0.2.14
+loguru==0.7.2
+
