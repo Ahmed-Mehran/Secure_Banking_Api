@@ -117,9 +117,14 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": getenv("POSTGRES_DB"),
+        "USER": getenv("POSTGRES_USER"),
+        "PASSWORD": getenv("POSTGRES_PASSWORD"),
+        "HOST": getenv("POSTGRES_HOST"),
+        "PORT": getenv("POSTGRES_PORT"),
+        
     }
 }
 
@@ -203,7 +208,7 @@ LOGURU_LOGGING = {
                                                  
             "level": "DEBUG",  ## By this we mean that we are going to store log message of level debug and the levels above debug(info, success and warning)
             
-            "filter": lambda record: record["level"].no <= logger.level("WARNING"),  ## this filter function checks if the log records is less than or equal to warning level. This means
+            "filter": lambda record: record["level"].no <= logger.level("WARNING").no,  ## this filter function checks if the log records is less than or equal to warning level. This means
                                                                                      # that this log file will include the debug, info and warning logs but exclude error and critical logs
                                                                                      # The filter function is called for each log record.It checks if the log level number (record["level"].no)
                                                                                      # is less than or equal to the numeric value of WARNING.
@@ -235,7 +240,7 @@ LOGURU_LOGGING = {
                                                  
             "level": "ERROR", 
             
-            "filter": lambda record: record["level"].no >= logger.level("ERROR"), ## capturing error and critical logs
+            "filter": lambda record: record["level"].no >= logger.level("ERROR").no, ## capturing error and critical logs
                                                                                      
             "format": "{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}", 
             
