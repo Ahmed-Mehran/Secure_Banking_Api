@@ -187,6 +187,7 @@ LOGGING_CONFIG = None
 # When you write this line i.e LOGGING_CONFIG = None, you’re disabling Django’s automatic logging configuration so that you can control it fully using your own tool — here, loguru.
 # We write this LOGGING_CONFIG = None because when we use loguru, it provides its own powerful and flexible logging system, completely independent from Django’s built-in one.
 # If we let Django also apply its logging configuration, it can clash or duplicate logs, causing messy outputs or multiple handlers writing the same message.
+# HERE WE ARE JUST DISABLING THE DJANGO LOGGING CONFIG, NOT THE LOGS ITSELF FROM DJANGO OR OTHER LIBRARIES, WHICH WILL BE ANYHOW GENERATED
 
 
 LOGURU_LOGGING = {
