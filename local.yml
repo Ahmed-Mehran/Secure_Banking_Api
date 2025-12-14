@@ -1,0 +1,117 @@
+services:
+
+  api: &api # api is simply the name of your Django service. The extra part &api is called an anchor in YAML. It means: “Save this entire block with the name api so that I can reuse it somewhere else later.” Your tutor likely uses
+            # this anchor so they can later do something like <<: *api for another service, which copies all settings from the api section. In simple words, it is just a shortcut to reuse the same configuration again without retyping
+            # everything. If you do not reuse it anywhere, it is not needed, but many tutorials use it for DRY (Don’t Repeat Yourself) purposes. SO basically if I want to use this docker compose setting of the web service(api) again,
+            # I can reuse it using the anchor name and the * i.e. *api. We actually write it like <<: *api, *api is only the reference to the anchor, <<: is the YAML merge key. It tells YAML: “merge everything from this anchor into this block.”
+
+    build:
+      context: .    # Here this context means “Take the entire root project folder and make it available to the Docker build. See its needed because the Docker file is nested and not directly under the root 
+                    # directory(but this file is directly under the root). So the docker file does not have access to the root directory files. So this is what Context helps with, makes the files and folder 
+                    # of the root available for Docker build or simple for building the docker image.
+
+      dockerfile: ./docker/local/django/Dockerfile     # This tells Docker exactly where the Dockerfile is located inside that folder so that Docker could build the image of this service.
+
+      ## See if Docker compose file (in our case local.yml) and the docker build file is under the same directory i.e. root, then we dont need context and dockerfile specified separately and we could simply write --- build: .
+
+    volumes:
+      - .:/app:z 
+      - ./staticfiles:/app/staticfiles  # The general volume .:/app only mirrors your project code — it does not include the static files Django generates during collectstatic, because those files are created inside the container
+                                        # at runtime. Without this separate volume, the static files would stay inside the container and disappear when the container is deleted. The extra volume makes sure they are stored on your 
+                                        # machine and kept safe. NOT FULLY UNDERSTOOD TO WHY WE NEED IT, PENDING
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - ./.envs/.env.local
+
+    depends_on:
+      - postgres
+      - mailpit
+
+    command: /start.sh     # ./docker/local/django/start.sh  -- This full path command for start.sh is not working and the /start.sh is working, understand why(pending)
+                                              # See this is the command which actually starts the server i.e. do migrations and then start the server, but before this there should be two things done, firstly the Database should
+                                              # be ready(not the container). Its done when we build the image of the web service, the docker file hits and in that we have entrypoint.sh command at the end which basically checks 
+                                              # for it. Then the second thing before the server starts should be the depends_on variable containers should be up and running. Then this command actually starts the server, now this
+                                              # is nested so we define the full path for it
+ 
+    networks: 
+      - banker_local_nw   # The networks: - banker_local_nw line explicitly assigns the container to a named network, but it’s optional. Docker Compose automatically creates a default network for all services in the same Compose
+                          # file, so containers can communicate without manually defining a network. Explicit networks are only needed if you want custom names, advanced isolation, or multiple networks.
+
+
+  postgres:
+
+    build:
+      context: .  # why do we need to have all the file(root directory) accessible for postgress image build, for web service I can understand the docker file would need the entire project files but why for postgress, we could have 
+                  # simply mentioned the dockerfile thats it. See Docker always needs a build context, even if Postgres doesn’t use your project files. So we write context: . only because Docker requires some folder to send — not because
+                  # Postgres actually needs everything inside it.
+
+      dockerfile: ./docker/local/postgres/Dockerfile
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - banker_local_db:/var/lib/postgresql/data    # This line means: “Create a persistent folder on my host machine called banker_local_db and connect it to Postgres’s data folder inside the container (/var/lib/postgresql/data).
+                                                    # ” Postgres stores all real database files in that /data folder, so by attaching a volume, the data is saved on your host. This way, even if the Postgres container is deleted, 
+                                                    # your actual database (tables, rows, records) still remains safe in the host volume. If banker_local_db doesn’t exist yet, Docker automatically creates it the first time you 
+                                                    # run the containers.
+
+    env_file:
+      - ./.envs/.env.local   # Loads all the DB variables like DB name, password, host, username etc from the specified file and give them to the Postgres container when it starts.
+
+    networks: 
+      - banker_local_nw
+
+  
+  mailpit:
+
+    image: docker.io/axllent/mailpit:v1.20.3
+
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+    volumes:
+      - banker_mailpit_db:/data
+
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATA_FILE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+
+    networks:
+      - banker_local_nw
+
+
+networks:
+  banker_local_nw:
+    external: true
+
+volumes:
+  banker_local_db:
+  banker_mailpit_db:
+
+# The networks: and volumes: sections at the bottom of the compose file are simply definitions that your services use. Services like Django and Postgres mention banker_local_nw or banker_local_db, so
+# Docker needs to know what those names actually refer to. The networks: block tells Docker that banker_local_nw is an existing network created outside the compose file, and therefore it should not create
+# a new one. The volumes: block tells Docker to create or use a named volume called banker_local_db to store Postgres data permanently. These definitions are written at the same indentation level as 
+# services: because they are shared resources that all services can use.
+
+
+## COMMAND - drf-api mehranahmed$ docker compose -f local.yml config : we can run this command on terminal to check how our above services load up the environment variables and other stuff
+
+    
+
+    
+
+
+
+
+
+
+
+    
+
