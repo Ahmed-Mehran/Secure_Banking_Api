@@ -49,7 +49,13 @@ MAX_UPLOAD_SIZE = 1 * 1024 * 1024 ## This sets the maximum allowed file size for
                                   # from uploading excessively large files (like videos or huge images) that could slow down or crash your server. You can enforce this limit in file fields or forms.
 
 
+CSRF_TRUSTED_ORIGINS = ["http://localhost:8080"]  ## CSRF protection exists to make sure that only requests coming from trusted websites are accepted, so that no fake website can misuse a user’s login session.
+                                                   # When we add ["http://localhost:8080"] to CSRF_TRUSTED_ORIGINS, we are telling Django that requests coming from this frontend address are safe and trusted. 
+                                                   # So when the frontend running on localhost:8080 sends a request to the backend, Django does not block it during the CSRF check and allows the request to go through.
+                                                   # This is needed when the frontend and backend run on different ports or domains during development.(READ ABOUT CSRF IN DEPTH, ITS AN IMPORTANT TOPIC)
 
+LOCKOUT_DURATION = timedelta(minutes=1)  ## here LOCKOUT_DURATION is a variable, which is defined so that if a user tries to login multiple times and fails, he is then locked out for 1 minute
 
-                   
+LOGGIN_ATTEMPTS : 3   ## here LOGGIN_ATTEMPTS is also a variable and defines the number of login attempts a user can make before being locked out and in this case is 3 attempts
 
+OTP_EXPIRATION = timedelta(minutes=1)   ## here OTP_EXPIRATION is a variable as well and basically defines the time validity of the OTP i.e. after the specified time, the OTP would expire and wont work
