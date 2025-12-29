@@ -66,6 +66,38 @@ def send_otp_email(email, otp):  ## This defines a function whose responsibility
     except Exception as e:
             
             logger.error(f"Failed to send OTP email to {email}:  Error: {str(e)}")
+            
+    
+## Another email sending function that is going to send an email to the user when their account has been locked due to too many failed login attempts 
+def send_account_locked_email(request):
+    
+    current_user = request.user
+    
+    subject = gettext_lazy('Your account has been locked')
+    from_email = settings.DEFAULT_FROM_EMAIL
+    recipient_list = [current_user.email]
+
+    context = {
+        "user": current_user,
+        "lockout_duration": int(settings.LOCKOUT_DURATION.total_seconds() // 60),
+        "site_name": settings.SITE_NAME
+    }
+
+    html_email = render_to_string("emails/account_locked.html", context)
+    plain_email = strip_tags(html_email)
+
+    email = EmailMultiAlternatives(subject, plain_email, from_email, recipient_list)
+    email.attach_alternative(html_email, "text/html")
+
+    try:
+        email.send()
+        logger.info(f"Account Locked, Email sent to : {email}")
+    except Exception as e:
+        logger.error(f"Failed to send acccount locked email to {email}:  Error: {str(e)}")
+    
+
+            
+    
     
     
     
