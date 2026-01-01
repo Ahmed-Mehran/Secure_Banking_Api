@@ -27,7 +27,19 @@ def generate_username():
     
     username = f"{prefix}--{random_chars}" ## appending the prefix and random username generated
     
-    return username
+    return username ## the username might look like NB--M1H8O9AEOP
+
+
+## Now we are going to create a custom function to validate email addresses using Django's validate email method
+def validate_email_address(email):   ## This function validates whether the given email address follows the correct email format (for example, having @ and a valid domain structure). It uses Django’s built-in validate_email,
+                                     ## which checks only the syntax and structure of the email, not whether the email actually exists or can receive messages. This is field-level validation because it validates only one field \
+                                     ## (the email address) and checks its format independently, without needing any other fields or context.
+    
+    try:
+        validate_email(email)
+        
+    except ValidationError:
+        raise ValidationError (gettext_lazy("Enter a valid Email Address"))
     
     
     
