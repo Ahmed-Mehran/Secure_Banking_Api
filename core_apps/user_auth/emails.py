@@ -69,7 +69,7 @@ def send_otp_email(email, otp):  ## This defines a function whose responsibility
             
     
 ## Another email sending function that is going to send an email to the user when their account has been locked due to too many failed login attempts 
-def send_account_locked_email(request):
+def send_account_locked_email(request):  ## instructor has use self instead of request and thus has done self.email, self.user but this is also correct
     
     current_user = request.user
     
