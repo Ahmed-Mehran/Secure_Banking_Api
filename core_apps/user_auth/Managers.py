@@ -41,6 +41,70 @@ def validate_email_address(email):   ## This function validates whether the give
     except ValidationError:
         raise ValidationError (gettext_lazy("Enter a valid Email Address"))
     
+
+## Now we will define our custom manager class which is going to extend django's built in user manager(UserManager)
+class UserManager(UserManager):  ## The code for is totally same the User manager in the Mosaic Blueprint
+    
+    def _create_user(self, email, password, **extra_fields):   ## This is our private helper method that is going to be used to handle the user creation(private because it has _create, i.e dash before create and we dont call these methods directly)
+
+        if not email:
+            
+            raise ValueError(gettext_lazy("An email address must be provided"))
+        
+        if not password:
+            
+            raise ValueError(gettext_lazy("A Password must be provided"))
+        
+        username = generate_username()
+        
+        email = self.normalize_email()
+        
+        validate_email_address(email)
+        
+        user = self.model(
+            
+            username = username,
+            email = email,
+            **extra_fields
+        )
+        
+        user.password = make_password(password)
+        user.save(using=self._db)
+        
+        return user
+    
+    def create_user(self, email, password, **extra_fields):
+        
+        extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('is_staff', False)
+        
+        return self._create_user(email, password, **extra_fields)
+    
+    def create_superuser(self, email, password, **extra_fields): 
+        
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', False)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(gettext_lazy('Superuser must have is_staff=True.'))
+
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(gettext_lazy('Superuser must have is_superuser=True.'))
+
+        return self._create_user(email, password, **extra_fields)
+    
+## Qs.  See above we are defining a custom way to create and store user objects in the model. We are doing this because we are not working with the Default User model, we are working with a Custom user model and
+# for that we have to define a custom way to create and store users. That is what UserManagers() are for Now one confusion is that generally we directly define the UserManager() class and make it inherit from
+# Baseusermanager so we could easily get methods like normalize email and other, but why the tutor hasnt done that here and can we do that like class UserManager(BaseUserManager):
+        
+## Sol.  Your understanding of why UserManagers exist is correct, and the confusion you have is very valid. Normally, when we create a fully custom user model, we define our own manager by inheriting from BaseUserManager
+#  so we get helper methods like normalize_email() and full control over user creation. In your case, the tutor has chosen to inherit from Django’s built-in UserManager instead, which already extends BaseUserManager 
+#  internally and already provides useful methods like normalize_email() and the standard user-creation behavior. By inheriting from UserManager, the tutor is essentially reusing Django’s default user manager logic 
+#  while slightly customizing it to fit the project’s needs, instead of rebuilding everything from scratch. Yes, you absolutely can write class UserManager(BaseUserManager), and many projects do exactly that, but 
+#  inheriting from UserManager is also valid and sometimes preferred when you want Django’s default behavior plus small custom changes.
+        
+            
+            
     
     
     
