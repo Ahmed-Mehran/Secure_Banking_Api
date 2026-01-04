@@ -55,7 +55,7 @@ class UserManager(UserManager):  ## The code for is totally same the User manage
             
             raise ValueError(gettext_lazy("A Password must be provided"))
         
-        username = generate_username()
+        username = generate_username() 
         
         email = self.normalize_email()
         
@@ -92,6 +92,20 @@ class UserManager(UserManager):  ## The code for is totally same the User manage
             raise ValueError(gettext_lazy('Superuser must have is_superuser=True.'))
 
         return self._create_user(email, password, **extra_fields)
+    
+#### -- Explanation of above
+## So basically with this we are creating a method that will help us to manage Users(their creation and saving to DB). We have two methods for this(provided by django itself) first is create_user method and second is create_superuser. 
+# Both are used for creation and saving of user to db, the diff as the name suggests is that the former is for creating a simple user and latter is for creating a super user. The extra fields are all the fields in your user model other
+# than the one mentioned in these methods(email and password). see this extra field can be is_status, is_superuser and we could have explicitly mentioned each field here but by using **extrafields, its better and easy. These **extrafields
+# in simple are used to set values for other fields. Like it can take any arguement like isStatus, isActive etc etc. _create_user method is the actual method(private method, cant be called directly) which basically creates and saves the
+# user. We basically get the email, then password, generate a unique user name and with this, user = self.model( username = username, email = email, **extra_fields), we create an instance of the User record that we want to save. See this
+# is very helpful. As we are dealing with Custom user model, we have to have this custom manager for user creation and saving. When we had used default django user model, we didnt had to deal with this, as this was also dealt by django.
+# NOTE : WHEN USING A DJANGO CUSTOM MODEL, WE HAVE TO CREATE CUSTOM USER MANAGERS FOR USER CREATION AND SAVING TO DB. BUT WHEN USING THE DEFAULT DJANGO MODEL, WE DONT HAVE TO DEAL WITH THIS.
+# In short: When using a custom User model, Django does not know how to create and save users automatically, so we must define a custom UserManager with create_user and create_superuser. These methods handle user creation, set the correct
+# flags, and save the user to the database. The private _create_user method contains the actual creation logic and is reused by both. When using Django’s default User model, all of this is already handled by Django, so we don’t need to 
+# write a custom manager.
+    
+    
     
 ## Qs.  See above we are defining a custom way to create and store user objects in the model. We are doing this because we are not working with the Default User model, we are working with a Custom user model and
 # for that we have to define a custom way to create and store users. That is what UserManagers() are for Now one confusion is that generally we directly define the UserManager() class and make it inherit from
