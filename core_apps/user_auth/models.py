@@ -135,6 +135,28 @@ class User(AbstractUser):
                                                                                                      # OTP has not expired. This prevents old or reused OTPs from being accepted and is a crucial part of secure OTP-based authentication.
 
     objects = UserManager()     ## This connects your custom UserManager to the model. All user creation and database saving logic will go through this manager, which is required because you are using a custom user model.
+    
+
+
+
+
+    ## Now Below are some methods that we define within this User model. See these methods are invoked by the user instance/object that you have created and saved to DB. So we can initiate them user.set_otp(). 
+    #  Just remember these methods can be accessed by user instance/object
+    
+    def set_otp(self, otp: str) -> None:      ## Now the above method is basically saving the OTP data for the OTP field. If you remember we had generate_OTP method in utils.py and by that we could generate OTP and share in
+                                               # this method as parameter. The self.OTP is basically user.OTP i.e. the OTP field of current DB user. Here we are setting the user OTP field to generated OTP and also now setting 
+                                               # up an expiry time. See this method would be most likely called when a user wants to login by OTP or wants to reset password. At that time he can use this set_otp() method
+        
+        self.otp = otp
+        
+        self.otp_expiry_time = timezone.now() + settings.OTP_EXPIRATION
+        
+        self.save()
+        
+
+
+
+
 
 
         
