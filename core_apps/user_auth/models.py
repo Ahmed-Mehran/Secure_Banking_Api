@@ -176,10 +176,27 @@ class User(AbstractUser):
         
         return False
 
-
-
-
+    def handle_failed_login_attempts(self) -> None:      ## This method is a model instance method, so it is always called on a specific user object (for example, user.handle_failed_login_attempts()). Django does not call it 
+                                                          # automatically — it is usually called from your login or authentication logic when a login attempt fails (for example, when password verification fails or when verify_otp()
+                                                          # returns False). Each time it is called, it increases the failed_login_attempts count and stores the current time as the last failed attempt. If the number of failed attempts
+                                                          # reaches or exceeds settings.LOGIN_ATTEMPTS, the user’s account status is changed to LOCKED, the user record is saved, and an account-locked email is sent. If the limit has 
+                                                          # not yet been reached, the method simply updates and saves the failed attempts count. This is exactly how account lockout logic is typically implemented.
         
-    
+        self.failed_login_attempts += 1
+        
+        self.last_failed_login = timezone.now()
+        
+        if self.failed_login_attempts >= settings.LOGIN_ATTEMPTS:
+            
+            self.account_status = self.AccountStatus.LOCKED
+            
+            self.save()
+            
+            send_account_locked_email(self)
+            
+        self.save()
+
+
+
     
     
