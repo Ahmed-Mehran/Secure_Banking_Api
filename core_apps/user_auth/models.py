@@ -252,4 +252,42 @@ class User(AbstractUser):
             return True
         
         return False
+    
+    
+    @property
+    def full_name(self) -> str:                            ## This @property creates a computed field called full_name that is built automatically from first_name and last_name. Instead of storing the full name in the database, it combines 
+                                                            # them on the fly whenever you access user.full_name. In this code, it joins the first and last name with a space, converts the result to title case (capital first letters), and 
+                                                            # removes any extra spaces.  .title(): converts the string to title case → first letter of each word becomes capital e.g "mehran dar" → "Mehran Dar". .strip(): removes any extra
+                                                            # spaces from the start and end of the string e.g " Mehran Dar " → "Mehran Dar". This again has @property defined so that this method can behave like a property
+        
+        full_name = f"{self.first_name} {self.last_name}"
+        
+        return full_name.title().strip()
+
+
+    class Meta:                                             ## The Meta class is used to give extra instructions to Django about how this model should behave. Here, verbose_name and verbose_name_plural define human-friendly names for the
+                                                             # model that are shown in the Django admin panel instead of the default ones. Using gettext_lazy makes these names translatable for different languages. The ordering = ["-date_joined"] 
+                                                             # line tells Django to always return users ordered by date_joined in descending order, meaning the most recently joined users will appear first by default.
+                                                             # For example, with this Meta setup, in the Django admin panel, instead of showing “User object (1)”, it will show “User” for a single user and “Users” for multiple users
+        
+        verbose_name = gettext_lazy("User")
+        
+        verbose_name_plural = gettext_lazy("Users")
+        
+        ordering = ["-date_joined"]
+        
+
+    def has_role(self, role_name: str) -> bool:                ## has_role() is used to safely check a user’s role. It makes sure the user actually has a role and that it matches one of the predefined roles, so your code doesn’t break and only works 
+                                                                # with valid roles. This keeps role-based checks clean, safe, and reliable.
+        
+        return hasattr(self, "role") and self.role == role_name
+    
+
+    def __str__(self) -> str:                                     ## This method defines how the user object is represented as a string, especially in places like the Django admin, logs, or the Django shell. Instead of showing something unhelpful
+                                                                   # like User object (3), it returns a readable string containing the user’s full name and their role in a human-friendly format. get_role_display() is used to show the readable
+                                                                   # label of the role (not the stored value), making the output clearer and more meaningful.
+        return f"{self.full_name} - {self.get_role_display()}"    
+    
+    
+    
 
