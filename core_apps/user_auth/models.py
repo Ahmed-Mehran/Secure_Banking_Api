@@ -210,3 +210,43 @@ class User(AbstractUser):
         self.account_status = self.AccountStatus.ACTIVE
         
         self.save()
+        
+        
+    def unlock_account(self) -> None:                         ## These two pieces of code work together to control when a locked user can try to log in again. The unlock_account() method is a helper that simply resets everything related to 
+                                                               # the lock: it changes the account status back to ACTIVE, resets the failed login count to 0, clears the last failed login time, and saves the user. This method is not called
+                                                               # directly by the user; it is called internally when the lock duration has passed.
+                                                              ## The is_locked_out property is the main method that is checked before login or password reset. When it is called on a user object, it first checks whether the account is marked
+                                                              #  as LOCKED. If the account is not locked, it immediately returns False, meaning the user is free to proceed. If the account is locked, it then checks how much time has passed since
+                                                              #  the last failed login attempt. If the lock duration has already passed, it automatically unlocks the account by calling unlock_account() and returns False, meaning the user can
+                                                              #  now log in again. If the lock duration has not passed yet, it returns True, clearly indicating that the account is still locked and the user must wait.
+                                                              #  In short, This logic simply controls when a locked user can try again. The unlock_account() function resets the user back to normal once the wait time is over. The is_locked_out 
+                                                              #  check is used before login; it first sees if the account is locked, and if not, the user can continue. If it is locked, it checks whether enough time has passed—if yes, it 
+                                                              #  automatically unlocks the account and allows login; if not, it blocks the user. In short, the account locks for a fixed time, unlocks itself automatically after that time, 
+                                                              #  and clearly decides whether the user can log in or must wait.
+        
+        if self.account_status == self.AccountStatus.LOCKED:
+            
+            self.account_status = self.AccountStatus.ACTIVE
+            
+            self.failed_login_attempts = 0
+            
+            self.last_failed_login = None
+            
+            self.save()
+            
+            
+    @property
+    def is_locked_out(self) -> bool:
+        
+        if self.account_status == self.AccountStatus.LOCKED:
+            
+            if (self.last_failed_login and (timezone.now() - self.last_failed_login)> settings.LOCKOUT_DURATION):
+                
+                self.unlock_account()
+                
+                return False
+            
+            return True
+        
+        return False
+
