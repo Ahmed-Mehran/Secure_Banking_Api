@@ -197,6 +197,16 @@ class User(AbstractUser):
         self.save()
 
 
-
     
-    
+    def reset_failed_login_attempts(self) -> None:          ## this method is used to clear all failure-related data once the user successfully verifies. When a user enters a wrong OTP, verify_otp() returns False, and your login logic
+                                                             # can call handle_failed_login_attempts() to increase the failed_login_attempts count. When the user finally enters the correct OTP and verify_otp() returns True, this 
+                                                             # reset_failed_login_attempts() method is called to reset the failed attempts back to zero, clear the last failed login time, and mark the account as ACTIVE again. This 
+                                                             # ensures that past mistakes don’t keep affecting the user after a successful verification and keeps the account state clean and correct.
+        
+        self.failed_login_attempts = 0
+        
+        self.last_failed_login = None
+        
+        self.account_status = self.AccountStatus.ACTIVE
+        
+        self.save()
