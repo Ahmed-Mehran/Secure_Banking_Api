@@ -234,6 +234,7 @@ class User(AbstractUser):
             
             self.save()
             
+            
     ## @property is used on is_locked_out so that it can be accessed like a simple attribute instead of a method. In simple words, is_locked_out represents a state of the user (locked or not), not an action. Writing user.is_locked_out reads
     # naturally, like checking user.is_active, instead of calling user.is_locked_out(). Yes, we could have defined it as a normal method, and it would work perfectly fine. But @property is preferred here because is_locked_out is a check, not
     # an action. Using a method like user.is_locked_out() feels like you are triggering behavior, while user.is_locked_out clearly reads as a state or condition of the user. When we define @property the method behaves like a proeprty
