@@ -31,6 +31,8 @@ class User(AbstractUser):
                                # somehow, otherwise saving the superuser will fail. Because the createsuperuser command only prompts for fields in REQUIRED_FIELDS, the practical and correct approach is to include all 
                                # mandatory (non-nullable, non-blank) fields in REQUIRED_FIELDS, so Django asks for them during the command. So yes — while REQUIRED_FIELDS controls what Django asks you for, model field 
                                # constraints control what must exist, and to avoid errors, they should align
+                               # REQUIRED FIELDS BASICALLY SPECIFY THE FIELDS THAT WOULD BE APPEAR WHEN A WE WANT TO CREATE A SUPER USER. SO AS WE TYPE createsuperuser, THERE REQUIRED_FIELDS WOULD APPEAR TO US AND WE
+                               # HAVE TO FILL THESE FOR CREATING A SUPER USER
     
     
     class SecurityQuestions(models.TextChoices):  ## Choice field classes options
@@ -291,4 +293,10 @@ class User(AbstractUser):
     
     
     
-
+###### ---  CONFUSION: One thing I noticed in the above user model, we are not even having a password field. See if we dont have a password field like in our User DB model, how we are even going to verify login, because we 
+#                      verify login with password stored in DB vs the password entered?? and obviously user model cannot be without a password.
+##### --    ANSWER: Your concern is valid, but the key point is this: your User model does have a password field — it’s just not written explicitly. Since your User model inherits from AbstractUser, Django automatically
+#                   includes a password field in the database. That field stores the hashed password, not the plain text password. During login, Django never compares plain passwords directly; instead, it hashes the entered 
+#                   password and compares it with the hashed value stored in that inherited password field. So even though you don’t see password = models.CharField(...) in your model, it still exists and works exactly the same
+#                   way as in Django’s default user model. In simple words: the password is hidden from your code, safely stored by Django, and fully used during authentication — your user model is absolutely not password-less.
+#                   In short as User model is inheriting from AbstractUser It gets the password field by default(without even speicifying it)
