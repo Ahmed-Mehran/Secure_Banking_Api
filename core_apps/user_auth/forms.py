@@ -61,6 +61,7 @@ class DjangoUserCreationForm(UserCreationForm):
                                                    # here and model.serializers for serializers, these built in validations check if the email is in right format and then this field level validations check for addition validations.
                                                    # In short: Built-in validations run first (like checking email format), and then custom field-level validations (clean_email in forms or validate_email in serializers) run automatically
                                                    # to check additional rules.
+                                                   # SO THIS IS A FIELD LEVEL VALIDATION OF EMAIL OF USER MODEL
                                                    
         
         email = self.cleaned_data.get("email")
@@ -71,6 +72,61 @@ class DjangoUserCreationForm(UserCreationForm):
         return email
     
     
+    def clean_id_no(self):                         ## Now this again is a field level validation of id_no field of User model. Here we are checking that user always enters a unique id_no for it while registering
+        
+        id_no = self.cleaned_data.get("id_no")
+        
+        if User.objects.filter(id_no=id_no).exists():
+            raise ValidationError(gettext_lazy("A user with that ID number already exists."))
+        
+        return id_no
     
+    
+    
+    #### -------   CONFUSION:  Tell in me very simple words, if unique =True for email field in User model(and for id_no field as well), why do we still need this validation
+    #### -------   ANSWER:  In very simple words: unique=True protects the database, but clean_email protects the user experience. When you set unique=True on the email field, Django will stop duplicate
+    #                       emails from being saved at the database level. But if a user enters an email that already exists, the error will only come after form submission, often as a generic database
+    #                       error that is not very user-friendly. The clean_field validation checks this before saving, during form validation itself. This lets you show a clear, friendly message like
+    #                       “A user with that email already exists” instead of a confusing database error. So, unique=True is the final safety lock, and clean_email is an early, clean check to give a better experience.
+    
+    
+    
+    def clean(self):                  ## In Django forms, clean() plays the same role as validate() in DRF serializers—it is used for object-level validation, meaning validation that depends on multiple fields together 
+                                       # and runs after all field-level validations have already passed. At this stage, Django has not created or saved a User instance yet; it is only working with validated form data.
+                                       # In serializers, you receive all validated values inside the attrs dictionary, so you can directly do attrs["email"], attrs["is_superuser"], etc. In Django forms, the equivalent 
+                                       # container is cleaned_data. The only correct and supported way to access all validated field values inside clean() is by calling cleaned_data = super().clean(). This ensures that
+                                       # Django’s built-in cleaning logic and all clean_<field>() methods have already run, and you are working with safe, validated values.
+                                       # This super().clean() is direct and intended equivalent of attrs in serializer validate() methods.
+                                       # This method checks that regular users (non-superusers) must provide a security question and security answer. If the user is a superuser, these fields are allowed to be empty, so 
+                                       # the validation is skipped. This is why a separate object-level validation is needed here.
+        
+        cleaned_data = super().clean()
+        
+        is_superuser = cleaned_data.get("is_superuser")
+        
+        security_question = cleaned_data.get("security_question")
+        
+        security_answer = cleaned_data.get("security_answer")
+
+        if not is_superuser:
+            
+            if not security_question:
+                self.add_error(
+                    "security_question",
+                    gettext_lazy("Security question is required for regular users"),
+                )
+            if not security_answer:
+                self.add_error(
+                    "security_answer",
+                    gettext_lazy("Security answer is required for regular users"),
+                )
+                
+        return cleaned_data
+    
+    
+
+
+
+
 
 
