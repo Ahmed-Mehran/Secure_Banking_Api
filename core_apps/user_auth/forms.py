@@ -124,6 +124,29 @@ class DjangoUserCreationForm(UserCreationForm):
         return cleaned_data
     
     
+    def save(self, commit=True):            ## In very simple words, this save() method is giving you control over when the user is actually saved to the database, instead of always saving it immediately. Normally, when you call
+                                             # form.save(), Django creates the user object and directly saves it to the database. But sometimes you want to modify the user first (set extra fields, hash a password, send OTP, etc.) 
+                                             # before saving. That’s why this method overrides the parent save().
+                                             # commit=True, This is a flag which says by default commit parameter is True, so normal behavior is unchanged.
+        
+        user = super().save(commit=False)    ## This calls the parent form’s save() method but tells it, "Create the user object in memory, but DO NOT save it to the database yet". At this point, user exists as a Python object, but
+                                              # there is no database row yet.
+                                              
+                                              
+        
+        if commit:    ## If commit=True, now the user is finally saved to the database.
+            user.save()
+            
+        return user
+    ## THIS ABOVE PATTERN OF SAVING USER IS USEFUL, as this pattern lets you do things like: user = form.save(commit=False), set extra fields on user, then user.save() when you’re ready. Without this, Django would save the user 
+    # immediately and you’d lose control. In short commit=True/False gives you control over saving. commit=False creates the object without saving, and commit=True saves it to the database. This is why we override save() here.
+    ## SEE WE CAN ALSO MIMIC THE ABOVE DIRECTLY IN THE USER VIEW FUNCTION i.e. we can also in view function do something like user = form.save(), then overwrite the fields and then save again as it rewrites that field. 
+    #  Doing form.save() and then modifying the user and calling user.save() again means the database is written twice i.e it still affects the same record, does not create two records. From a correctness point of view, this is completely
+    #  safe and Django does this kind of thing in many real projects. The main downside is performance: each save() call is a database hit, and database calls are expensive when your system scales (many users, high traffic).
+    #  In small or medium applications, this extra write is usually not a big problem and is totally doable. However, best practice is to avoid unnecessary DB writes when possible. That’s why people often use commit=False inside
+    #  the form’s save() method—so you can set all required fields first and then save once.
+    
+    
 
 
 
