@@ -148,8 +148,84 @@ class DjangoUserCreationForm(UserCreationForm):
     
     
 
+## Now we would create a form that is going to be used for updating existing users. See now we have this UserChangeForm which is used for updating existing users. In terms of serializers if we think, UserCreationForm is used when creating
+# a new user, just like a UserCreateSerializer(Mosaic blueprint project) in DRF, and UserChangeForm is used when updating an existing user, similar to a UserEditSerializer. The purpose (use case) of both pairs is the same: one handles 
+# creation and the other handles updates. The main difference is how they work internally—forms deal with HTML form input and Django views, while serializers deal with JSON data and APIs—but conceptually they serve the same roles in 
+# their respective worlds.
+class DjangoUserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = [
+            "email",
+            "id_no",
+            "first_name",
+            "middle_name",
+            "last_name",
+            "security_question",
+            "security_answer",
+            "is_active",
+            "is_staff",
+            "is_superuser",
+        ]
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
+        if User.objects.exclude(pk=self.instance.pk).filter(email=email).exists():  ## This exclude logic here allows the user to keep their existing email while updating their profile(user might want to change any other stuff except the email),
+                                                                                     # because their own record is ignored in the filter check using exclude(pk=self.instance.pk). But if the new email they enter matches the email of any other user
+                                                                                     # in the database (any record with a different primary key), then the validation fails and an error is raised. This way, email uniqueness is maintained across 
+                                                                                     # all users, while still allowing a user to update their own details safely.
+            
+            raise ValidationError(gettext_lazy("A user with that email already exists."))
+        
+        return email
+
+    def clean_id_no(self):
+        
+        id_no = self.cleaned_data.get("id_no")
+        
+        if User.objects.exclude(pk=self.instance.pk).filter(id_no=id_no).exists():
+            raise ValidationError(gettext_lazy("A user with that ID number already exists."))
+        
+        return id_no
+    
+    
+    def clean(self):      ## This is again the object-level validation, reused from user creation logic above, to ensure security question and answer are required for non-superusers.
+        
+        cleaned_data = super().clean()
+        
+        is_superuser = cleaned_data.get("is_superuser")
+        
+        security_question = cleaned_data.get("security_question")
+        
+        security_answer = cleaned_data.get("security_answer")
+
+        if not is_superuser:
+            
+            if not security_question:
+                self.add_error(
+                    "security_question",
+                    gettext_lazy("Security question is required for regular users"),
+                )
+                
+            if not security_answer:
+                self.add_error(
+                    "security_answer",
+                    gettext_lazy("Security answer is required for regular users"),
+                )
+                
+        return cleaned_data
+    
+    
 
 
+#### ----- CONFUSION: In ecommerce project we have used ModelForm inheritance for updating a user and here we are using UserChangeForm, what is the difference??
+#### ----- ANSWER: In simple words, both approaches are used to update users, but they are meant for different levels of responsibility. When you inherit from 
+#                  ModelForm, you are taking full control of how the form works, which fields appear, and how validation and saving happen. This is fine for small or simple projects, but it also means you are responsible 
+#                  for handling sensitive things like passwords and authentication correctly, which can be risky. On the other hand, UserChangeForm is specially built by Django for updating user objects safely and correctly.
+#                  It already understands how Django users work, how passwords should be handled, and how updates should behave in admin and authentication flows. That is why in your current project, which is security-focused,
+#                  using UserChangeForm is better and safer, while ModelForm was acceptable in your earlier, simpler projects. Also if we compare in terms of serializers. a ModelForm is like a basic serializers.Serializer 
+#                  because you manually decide what fields to expose and how things should work, and Django doesn’t assume much special behavior. On the other hand, UserCreationForm and UserChangeForm are more like ModelSerializer
+#                  because they are tightly coupled to the User model and come with a lot of built-in behavior, rules, and safety (especially around passwords and user updates).
 
 
 
