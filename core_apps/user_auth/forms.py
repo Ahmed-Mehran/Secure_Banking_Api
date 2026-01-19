@@ -23,7 +23,7 @@ from django.utils.translation import gettext_lazy
 
 from .models import User
 
-class DjangoUserCreationForm(UserCreationForm):
+class CustomUserCreationForm(UserCreationForm):
     
     class Meta:
         
@@ -152,7 +152,7 @@ class DjangoUserCreationForm(UserCreationForm):
 # a new user, just like a UserCreateSerializer(Mosaic blueprint project) in DRF, and UserChangeForm is used when updating an existing user, similar to a UserEditSerializer. The purpose (use case) of both pairs is the same: one handles 
 # creation and the other handles updates. The main difference is how they work internally—forms deal with HTML form input and Django views, while serializers deal with JSON data and APIs—but conceptually they serve the same roles in 
 # their respective worlds.
-class DjangoUserChangeForm(UserChangeForm):
+class CustomUserChangeForm(UserChangeForm):
     class Meta:
         model = User
         fields = [
