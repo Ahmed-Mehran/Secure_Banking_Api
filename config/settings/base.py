@@ -184,6 +184,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "user_app.User"   ## This basically stores or tells django the location of custom user model that we have created 
 
 
+
+### -- Now we will work with DRF spectacular, DRF Spectacular is an addon/library for DRF that automatically generates API documentation (OpenAPI / Swagger schema) for APIs built using DRF
+#      We have to configure it under the REST_FRAMEWORK{} settings here
+REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    }
+
+## After the above, we have to add a spectacular setting for our base.py. The above and below is to done by default whenever we want to work with DRF spectacular, you can read about DRF spectaculr more from drf-spectacular documentation
+SPECTACULAR_SETTINGS = {
+    "TITLE": "NextGen Bank API",
+    "DESCRIPTION": "An API built for a banking system",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "LICENSE": {
+        "name": "MIT License",
+        "url": "https://opensource.org/license/mit",
+    },
+}
+
+
 LOGGING_CONFIG = None 
 # By default, Django automatically sets up its own logging configuration when the project starts. It uses a setting called LOGGING inside your settings.py file and applies it through:
 
