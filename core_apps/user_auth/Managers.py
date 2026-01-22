@@ -57,7 +57,7 @@ class UserManager(UserManager):  ## The code for is totally same the User manage
         
         username = generate_username() 
         
-        email = self.normalize_email()
+        email = self.normalize_email(email)
         
         validate_email_address(email)
         
@@ -83,7 +83,7 @@ class UserManager(UserManager):  ## The code for is totally same the User manage
     def create_superuser(self, email, password, **extra_fields): 
         
         extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', False)
+        extra_fields.setdefault('is_superuser', True)
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError(gettext_lazy('Superuser must have is_staff=True.'))

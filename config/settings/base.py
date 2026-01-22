@@ -181,7 +181,7 @@ STATIC_ROOT = str(BASE_DIR / "staticfiles")
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-AUTH_USER_MODEL = "user_app.User"   ## This basically stores or tells django the location of custom user model that we have created 
+AUTH_USER_MODEL = "user_auth.User"   ## This basically stores or tells django the location of custom user model that we have created 
 
 
 
