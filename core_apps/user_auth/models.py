@@ -79,7 +79,7 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) ## This creates a UUID-based primary key instead of an auto-incrementing integer. UUIDs are hard to guess, globally unique,
                                                                                  # and more secure, especially useful in APIs and distributed systems.
                                                                                  
-    username = models.CharField(gettext_lazy("Username"), max_length=12, unique=True) ## This stores a system-generated username that uniquely identifies the user internally. Even though login uses email,
+    username = models.CharField(gettext_lazy("Username"), max_length=50, unique=True) ## This stores a system-generated username that uniquely identifies the user internally. Even though login uses email,
                                                                                        # usernames are still useful for internal references and display.
                                                                                        # The username field is not for the user to enter. It exists only so the system has a unique name to store in the database for each user.
                                                                                        # The user is not even required to enter value for this field and thus this field would not be visible to the user(in user form).
