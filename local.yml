@@ -20,8 +20,11 @@ services:
                                         # at runtime. Without this separate volume, the static files would stay inside the container and disappear when the container is deleted. The extra volume makes sure they are stored on your 
                                         # machine and kept safe. NOT FULLY UNDERSTOOD TO WHY WE NEED IT, PENDING
 
-    ports:
-      - "8000:8000"
+    # ports:
+    #   - "8000:8000"
+
+    expose:               ## added in exchange for above for nginx-- understand why
+            - "8000"
 
     env_file:
       - ./.envs/.env.local
@@ -87,6 +90,22 @@ services:
       - banker_local_nw
 
 
+  nginx:                                       ## added the config for Nginx--understanding is pending
+        build:
+            context: ./docker/local/nginx
+            dockerfile: Dockerfile
+        restart: always
+        ports:
+            - "8080:80"
+        volumes:
+            - ./staticfiles:/app/staticfiles
+            - logs_store:/var/log/nginx
+        depends_on:
+            - api
+        networks:
+            - banker_local_nw
+
+
 networks:
   banker_local_nw:
     external: true
@@ -94,6 +113,7 @@ networks:
 volumes:
   banker_local_db:
   banker_mailpit_db:
+  logs_store:
 
 # The networks: and volumes: sections at the bottom of the compose file are simply definitions that your services use. Services like Django and Postgres mention banker_local_nw or banker_local_db, so
 # Docker needs to know what those names actually refer to. The networks: block tells Docker that banker_local_nw is an existing network created outside the compose file, and therefore it should not create
