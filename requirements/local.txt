@@ -70,6 +70,10 @@ urllib3==2.5.0
 vine==5.1.0
 watchfiles==0.22.0
 wcwidth==0.2.14
+flower==2.0.1
+redis==5.0.3
+django-redis==5.4.0
+
 
 
 
