@@ -62,9 +62,9 @@ class ContentView(TimeStampedModel):
             view, created = cls.objects.get_or_create(
                 content_type=content_type,
                 object_id=content_object.id,
+                user=user,
+                viewer_ip=viewer_ip,
                 defaults={
-                    "user": user,
-                    "viewer_ip": viewer_ip,
                     "last_viewed": timezone.now(),
                 },
             )
