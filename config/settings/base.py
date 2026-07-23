@@ -14,7 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from os import getenv, path
 from loguru import logger
-from datetime import timedelta
+from datetime import timedelta, date
 import cloudinary
 
 
@@ -186,6 +186,11 @@ STATIC_ROOT = str(BASE_DIR / "staticfiles")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = "user_auth.User"   ## This basically stores or tells django the location of custom user model that we have created 
 
+DEFAULT_BIRTH_DATE = date(1900, 1, 1)
+DEFAULT_DATE = date(2000, 1, 1)
+DEFAULT_EXPIRY_DATE = date(2028, 1, 1)
+DEFAULT_COUNTR = "IND"
+DEFAULT_PHONE_NUMBER = "+91-123123123"
 
 
 ### -- Now we will work with DRF spectacular, DRF Spectacular is an addon/library for DRF that automatically generates API documentation (OpenAPI / Swagger schema) for APIs built using DRF
