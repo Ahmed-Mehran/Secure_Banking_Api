@@ -7,3 +7,7 @@ class UserProfileConfig(AppConfig):
     name = "core_apps.user_profile"
     verbose_name = _("User Profile")
     
+    
+    def ready(self) -> None:
+        import core_apps.user_profile.signals        
+    
