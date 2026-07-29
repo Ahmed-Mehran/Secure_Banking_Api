@@ -189,8 +189,8 @@ AUTH_USER_MODEL = "user_auth.User"   ## This basically stores or tells django th
 DEFAULT_BIRTH_DATE = date(1900, 1, 1)
 DEFAULT_DATE = date(2000, 1, 1)
 DEFAULT_EXPIRY_DATE = date(2028, 1, 1)
-DEFAULT_COUNTR = "IND"
-DEFAULT_PHONE_NUMBER = "+91-123123123"
+DEFAULT_COUNTRY = "IND"
+DEFAULT_PHONE_NUMBER = "+919999999999"
 
 
 ### -- Now we will work with DRF spectacular, DRF Spectacular is an addon/library for DRF that automatically generates API documentation (OpenAPI / Swagger schema) for APIs built using DRF
