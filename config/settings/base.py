@@ -240,6 +240,13 @@ cloudinary.config(
 )
 
 
+COOKIE_NAME = "access"
+COOKIE_SAMESITE = "Lax"
+COOKIE_PATH = "/"
+COOKIE_HTTPONLY = True
+COOKIE_SECURE = getenv("COOKIE_SECURE", "True") == "True"
+
+
 LOGGING_CONFIG = None 
 # By default, Django automatically sets up its own logging configuration when the project starts. It uses a setting called LOGGING inside your settings.py file and applies it through:
 
