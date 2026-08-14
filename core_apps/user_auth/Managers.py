@@ -4,7 +4,7 @@ from os import getenv
 from typing import Any, Optional
 
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth.models import UserManager 
+from django.contrib.auth.models import UserManager as DjangoUserManager 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.utils.translation import gettext_lazy
@@ -43,7 +43,7 @@ def validate_email_address(email):   ## This function validates whether the give
     
 
 ## Now we will define our custom manager class which is going to extend django's built in user manager(UserManager)
-class UserManager(UserManager):  ## The code for is totally same the User manager in the Mosaic Blueprint
+class UserManager(DjangoUserManager):  ## The code for is totally same the User manager in the Mosaic Blueprint
     
     def _create_user(self, email, password, **extra_fields):   ## This is our private helper method that is going to be used to handle the user creation(private because it has _create, i.e dash before create and we dont call these methods directly)
 
