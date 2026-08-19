@@ -197,6 +197,28 @@ DEFAULT_PHONE_NUMBER = "+919999999999"
 #      We have to configure it under the REST_FRAMEWORK{} settings here
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    
+    "DEFAULT_AUTHENTICATION_CLASSES":[
+        "core_apps.common.cookie_auth.CookieAuthentication"
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
+    "DEFAULT_FILTER_BACKENDS": [
+        "django_filters.rest_framework.DjangoFilterBackend",
+    ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "50/day",
+        "user": "100/day",
+    },
+    
+    
     }
 
 ## After the above, we have to add a spectacular setting for our base.py. The above and below is to done by default whenever we want to work with DRF spectacular, you can read about DRF spectaculr more from drf-spectacular documentation
