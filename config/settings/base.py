@@ -221,6 +221,32 @@ REST_FRAMEWORK = {
     
     }
 
+
+SIMPLE_JWT = {
+    "SIGNING_KEY": getenv("SIGNING_KEY"),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ROTATE_REFRESH_TOKENS": True,
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+}
+
+
+DJOSER = {
+    "USER_ID_FIELD": "id",
+    "LOGIN_FIELD": "email",
+    "TOKEN_MODEL": None,
+    "USER_CREATE_PASSWORD_RETYPE": True,
+    "SEND_ACTIVATION_EMAIL": True,
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True,
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+    "ACTIVATION_URL": "activate/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "password-reset/{uid}/{token}",
+    "SERIALIZERS": {
+        "user_create": "core_apps.user_auth.serializers.UserCreateSerializer",
+    },
+}
+
 ## After the above, we have to add a spectacular setting for our base.py. The above and below is to done by default whenever we want to work with DRF spectacular, you can read about DRF spectaculr more from drf-spectacular documentation
 SPECTACULAR_SETTINGS = {
     "TITLE": "NextGen Bank API",
