@@ -56,6 +56,6 @@ CSRF_TRUSTED_ORIGINS = ["http://localhost:8080"]  ## CSRF protection exists to m
 
 LOCKOUT_DURATION = timedelta(minutes=1)  ## here LOCKOUT_DURATION is a variable, which is defined so that if a user tries to login multiple times and fails, he is then locked out for 1 minute
 
-LOGGIN_ATTEMPTS : 3   ## here LOGGIN_ATTEMPTS is also a variable and defines the number of login attempts a user can make before being locked out and in this case is 3 attempts
+LOGGIN_ATTEMPTS = 3   ## here LOGGIN_ATTEMPTS is also a variable and defines the number of login attempts a user can make before being locked out and in this case is 3 attempts
 
 OTP_EXPIRATION = timedelta(minutes=1)   ## here OTP_EXPIRATION is a variable as well and basically defines the time validity of the OTP i.e. after the specified time, the OTP would expire and wont work

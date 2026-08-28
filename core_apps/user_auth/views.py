@@ -85,7 +85,7 @@ class CustomTokenCreateView(TokenCreateView):
                 logger.error(
                     f"Failed login attempts: {failed_attempts}  for user: {email}"
                 )
-                if failed_attempts >= settings.LOGIN_ATTEMPTS:
+                if failed_attempts >= settings.LOGGIN_ATTEMPTS:  
                     return Response(
                         {
                             "error": f"You have exceeded the maximum number of login attempts. "

@@ -69,16 +69,14 @@ def send_otp_email(email, otp):  ## This defines a function whose responsibility
             
     
 ## Another email sending function that is going to send an email to the user when their account has been locked due to too many failed login attempts 
-def send_account_locked_email(request):  ## instructor has use self instead of request and thus has done self.email, self.user but this is also correct
-    
-    current_user = request.user
+def send_account_locked_email(self):  ## instructor has use self instead of request and thus has done self.email, self.user but this is also correct
     
     subject = gettext_lazy('Your account has been locked')
     from_email = settings.DEFAULT_FROM_EMAIL
-    recipient_list = [current_user.email]
+    recipient_list = [self.email]
 
     context = {
-        "user": current_user,
+        "user": self,
         "lockout_duration": int(settings.LOCKOUT_DURATION.total_seconds() // 60),
         "site_name": settings.SITE_NAME
     }

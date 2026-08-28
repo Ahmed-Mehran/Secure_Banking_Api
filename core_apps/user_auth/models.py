@@ -188,7 +188,7 @@ class User(AbstractUser):
         
         self.last_failed_login = timezone.now()
         
-        if self.failed_login_attempts >= settings.LOGIN_ATTEMPTS:
+        if self.failed_login_attempts >= settings.LOGGIN_ATTEMPTS:
             
             self.account_status = self.AccountStatus.LOCKED
             
