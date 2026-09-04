@@ -180,3 +180,29 @@ class ProfileSerializer(serializers.ModelSerializer):
         return ContentView.objects.filter(
             content_type=content_type, object_id=obj.id
         ).count()
+        
+        
+class ProfileListSerializer(serializers.ModelSerializer):
+    full_name = serializers.ReadOnlyField(source="user.full_name")
+    username = serializers.ReadOnlyField(source="user.username")
+    email = serializers.EmailField(source="user.email", read_only=True)
+    photo = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        fields = [
+            "full_name",
+            "username",
+            "gender",
+            "nationality",
+            "country_of_birth",
+            "email",
+            "phone_number",
+            "photo",
+        ]
+
+    def get_photo(self, obj: Profile) -> str | None:
+        try:
+            return obj.photo.url
+        except AttributeError:
+            return None
